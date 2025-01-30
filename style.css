@@ -295,6 +295,7 @@ body{
     display: none;
     top: 1.99rem;
     left: 11.8rem;
+    border: none;
   }
 
   @keyframes revertslide_ {

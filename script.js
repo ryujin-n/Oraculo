@@ -87,7 +87,7 @@ const dialogues5 = [
   { name: "Oráculo", text: "Do que ela te protege?"},
 ];
 
-var typingSpeed = 10; // 
+var typingSpeed = 40; // 
 let currentDialogueIndex = 0;
 let currentDialogues = introd;
 
