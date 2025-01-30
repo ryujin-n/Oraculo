@@ -39,6 +39,7 @@ var backgroundAudio = new Howl({
   src: ['src/ambiance.mp3'],
   volume: 0.1,
   autoplay: false, 
+  loop: true,
   onload: () => {
     
   }
