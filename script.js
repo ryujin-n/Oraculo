@@ -6,7 +6,7 @@ const startButton = document.getElementById("startButton");
 const finishButton = document.getElementById("finishButton");
 const tarot = document.getElementById("tarot");
 const fundo = document.getElementById("fundod");
-var audio = document.getElementById("background-audio");
+var backgroundAudio = document.getElementById("background-audio");
 var stage = "";
 const slide = document.querySelector('.slide');
 const cards = document.querySelectorAll("#card, #card2, #card3");
@@ -31,20 +31,13 @@ cardss.forEach(card => {
 
 slide.classList.add('slide');
 
-const typeSound = new Howl({
+var typeSound = new Howl({
   src: ['src/oracle.wav'], 
   volume: 0.4, 
 });
 
-var backgroundAudio = new Howl({
-  src: ['src/ambiance.mp3'],
-  volume: 0.1,
-  autoplay: false, 
-  loop: true,
-  onload: () => {
-    
-  }
-});
+backgroundAudio.volume = 0.1;
+
 
 const introd = [
   { name: "???", text: "Olá...viajante" },
@@ -96,10 +89,28 @@ const dialogues5 = [
   { name: "Oráculo", text: "Ou melhor..."},
   { name: "Oráculo", text: "Do que ela te protege?"},
 ];
+const sry = [
+  { name: "???", text: "O que...?" },
+  { name: "???", text: "..." },
+  { name: "Nyra", text: "Desculpar...?" },
+  { name: "Nyra", text: "Eu tentei, pai... " },
+  { name: "Nyra", text: "Tentei encontrar uma razão para perdoar você. Para acreditar que, de alguma forma, o que fez tinha um propósito. " },
+  { name: "Nyra", text: "Mas toda vez que fecho os olhos, tudo o que vejo são cinzas..." },
+  { name: "Nyra", text: "Cinzas da nossa casa, da nossa família… do que um dia fomos..." },
+  { name: "Nyra", text: "Você jurou nos proteger." },
+  { name: "Nyra", text: "Mas no fim, foi você quem nos destruiu." },
+  { name: "Nyra", text: "Não foram os inimigos, não foi a guerra… foi você." },
+  { name: "Nyra", text: "Suas escolhas, sua sede de algo maior do que nós." },
+  { name: "Nyra", text: "Você nos sacrificou por um ideal que nem sei se era real." },
+  { name: "Nyra", text: "Então não, eu não posso te perdoar." },
+  { name: "Nyra", text: "Porque perdão não apaga o vazio que você deixou..." },
+];
 
 var typingSpeed = 40; // 
 let currentDialogueIndex = 0;
 let currentDialogues = introd;
+let interromperDialogo = false;
+
 
 function moveDialogueBox() {
     dialogueBox.style.transition = "transform 1s ease"; 
@@ -133,10 +144,16 @@ function hideCards() {
 }
 
   function playDialogue() {
-      backgroundAudio.play()
-      dialogueBox.style.display = "block";
-      startButton.style.display = "none";  
-      typeDialogue();
+
+    if (interromperDialogo){
+      backgroundAudio.pause()
+      return
+    }
+
+    backgroundAudio.play()
+    dialogueBox.style.display = "block";
+    startButton.style.display = "none";  
+    typeDialogue();
   }
   
 function cartas(dialogo) {
@@ -162,7 +179,7 @@ function cartas(dialogo) {
     typingSpeed = 200;
     dialogueBox.style.transition = "max-width 1s ease"; 
     dialogueBox.style.maxWidth = "340px";
-    backgroundAudio.stop(); 
+    backgroundAudio.pause(); 
   }
   if (dialogo === "Do que ela te protege?") {
     dialogueBox.style.display = "none";
@@ -170,6 +187,19 @@ function cartas(dialogo) {
     fundo.src=""
     video.play();
   }
+  if (dialogo === "O que...?" ) {
+    typingSpeed = 200; 
+    backgroundAudio.pause(); 
+  }
+  if (dialogo === "..." ) {
+    typingSpeed = 40; 
+  }
+  if (dialogo === "Desculpar...?" ) {
+    backgroundAudio.src="src/audio2.mp3"
+    backgroundAudio.load();  
+    backgroundAudio.play(); 
+  }
+
   if (dialogo === "Qual o seu nome?") {
     dialogueBox.style.transition = "transform 1s ease"; 
     dialogueBox.style.transform = "translateY(-3rem)";
@@ -178,20 +208,71 @@ function cartas(dialogo) {
 
     send.onclick = function () {
         let nomeD = nome.value.trim();
-        if (nomeD === "") return; 
-        nomeT = nomeD.charAt(0).toUpperCase() + nomeD.slice(1).toLowerCase();
+        if (nomeD === "") return;
+        else if (nomeD.toUpperCase().trim() === "AUDREY") {
 
-        dialogues[0].text = "Um prazer te conhecer..." + nomeT + ".";
+      }
+        else if (nomeD.toUpperCase().trim() === "ENFORCADO" || nomeD.toUpperCase().trim() === "O ENFORCADO" || nomeD.toUpperCase().trim() === "HANGED MAN"|| nomeD.toUpperCase().trim() === "HANGEDMAN"|| nomeD.toUpperCase().trim() === "OENFORCADO") {
+          interromperDialogo = true
+          dialogueBox.style.display="none"
+          nome.style.display="none"
+          send.style.display="none"
+          fundo.style.display = "none"
 
-        hideform();
+          let video = document.createElement("video");
+          video.src = "src/fim.mp4"; 
+          video.autoplay = true;
+          video.loop = false;
+          video.controls = false;
+          video.style.position = "fixed";
+          video.style.width = "100vw";
+          video.style.height = "100vh";
+      
+          document.body.appendChild(video);
 
-        currentDialogues = dialogues;
-        currentDialogueIndex = 0;
+          video.addEventListener('ended', function() {
+            video.style.display = "none";
+          });
+      }
+      if (nomeD.toUpperCase().trim() === "MALDI") {
 
+        dialogueBox.style.transition = "max-width 1s ease"; 
+        dialogueBox.style.maxWidth = "600px";
+        characterName.style.fontFamily = "Bachroque, sans-serif"
+        dialogueText.style.fontFamily = " Flink, sans-serif"
+        nome.style.display = "none";
+        send.style.display = "none";
         dialogueBox.style.transform = "translateY(0rem)";
+    
+        if (typeSound) {
+            typeSound.stop();  
+            typeSound.unload(); 
+        }
+    
+        typeSound = new Howl({
+            src: ['src/oracle2.mp3'],
+            volume: 0.4,
+        });
+    
+        currentDialogues = sry;
+        currentDialogueIndex = 0;
         playDialogue();
-    };
 
+    }
+    else{
+      nomeT = nomeD.charAt(0).toUpperCase() + nomeD.slice(1).toLowerCase();
+
+      dialogues[0].text = "Um prazer te conhecer..." + nomeT + ".";
+
+      hideform();
+
+      currentDialogues = dialogues;
+      currentDialogueIndex = 0;
+
+      dialogueBox.style.transform = "translateY(0rem)";
+      playDialogue();
+    }
+    };
     return; 
   }
 }
@@ -215,7 +296,7 @@ function typeDialogue() {
     }
     return;
   }
-
+      
   const { name, text } = currentDialogues[currentDialogueIndex];
   characterName.textContent = name;
   dialogueText.textContent = "";
@@ -224,6 +305,7 @@ function typeDialogue() {
   let speed = typingSpeed; 
 
   function typeNextChar() {
+
       if (index < text.length) {
           dialogueText.textContent += text.charAt(index);
 
